@@ -5,8 +5,11 @@ import pickle
 from tkinter import messagebox
 
 
-with open('KNeighbors.pickle', 'rb') as file:
+with open('RandomForest.pickle', 'rb') as file:
     model = pickle.load(file)
+
+with open('scaler.pkl', 'rb') as file:
+    scaler = pickle.load(file)
 
 def submit():
     try:
@@ -32,6 +35,7 @@ def submit():
         ]
     ])
     # Make predictions using the pre-trained model
+    input_data = scaler.transform(input_data)
     prediction = model.predict(input_data)
 
     result_text = "Death" if prediction == 1 else "Not Death"
