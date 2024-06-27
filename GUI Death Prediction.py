@@ -3,7 +3,7 @@ import numpy as np
 import pickle
 
 from tkinter import messagebox
-
+from tkinter import ttk
 
 with open('RandomForest.pickle', 'rb') as file:
     model = pickle.load(file)
@@ -27,11 +27,11 @@ def submit():
     # Collect all the input data into a single array
     input_data = np.array([
         [
-                age,
-                ejection_fraction,
-                serum_creatinine,
-                serum_sodium,
-                time
+            age,
+            ejection_fraction,
+            serum_creatinine,
+            serum_sodium,
+            time
         ]
     ])
     # Make predictions using the pre-trained model
@@ -48,6 +48,24 @@ def validate_integer(value_if_allowed):
         return True
     else:
         return False
+
+def comboHandler(e):
+    selection = combo.get()
+    messagebox.showinfo(
+        title="Model Selected",
+        message=f"Selected model: {selection}"
+    )
+    global model
+    if selection == "RandomForest":
+        with open('RandomForest.pickle', 'rb') as file:
+            model = pickle.load(file)
+    elif selection == "CatBoostClassifier":
+        with open('CatBoostClassifier.pickle', 'rb') as file:
+            model = pickle.load(file)
+    elif selection == "KNN":
+        with open('KNeighbors.pickle', 'rb') as file:
+            model = pickle.load(file)
+    print(model)
 
 root = tk.Tk()
 root.title("Death Predictor")
@@ -70,12 +88,15 @@ left_frame.grid(row=0, column=0, padx=10, pady=10, sticky="n")
 welcome_label = tk.Label(left_frame, text="Welcome to Death Predictor:")
 welcome_label.pack(anchor="w")
 
-
 # Right panel
 right_frame = tk.Frame(root)
 right_frame.grid(row=0, column=1, padx=10, pady=10, sticky="n")
 
+combo = ttk.Combobox(right_frame, state="readonly", values=["RandomForest", "CatBoostClassifier", "KNN"])
+combo.bind("<<ComboboxSelected>>", comboHandler)
+
 fields = [
+    ("Predictor Model:", combo),
     ("Name:", tk.Entry(right_frame, textvariable=name_var)),
     ("Age:", tk.Entry(right_frame, textvariable=age_var, validate="key", validatecommand=vcmd)),
     ("What is your most recent ejection fraction (EF) measurement?", tk.Entry(right_frame, textvariable=ef_var, validate="key", validatecommand=vcmd)),
